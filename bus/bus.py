@@ -381,7 +381,7 @@ class Method(object):
         return async_result.get()
 
 
-def AsyncResult(object):
+class AsyncResult(object):
     def __init__(self, _id, bus, result=unset):
         self.id = _id
         self.bus = bus
