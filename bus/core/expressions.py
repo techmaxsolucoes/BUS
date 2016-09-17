@@ -30,17 +30,6 @@ infix_ops = (
     ('ISub', '-=', '__isub__'), # x -= y
     ('RSub', '-', '__rsub__'), # y - x
     ('Mul', '*', '__mul__'), # x * y
-    ('IMul', '*=', '__imul__'), # x *= y
-    ('RMul', '*', '__rmul__'), # y * x
-    ('Div', '/', '__div__'), # x / y
-    ('IDiv', '/=', '__idiv__'), # x /= y
-    ('RDiv', '/', '__rdiv__'), # y / x
-    ('Mod', '%', '__mod__'), # x % y
-    ('RMod', '%', '__rmod__'), # y % x
-    ('IMod', '%=', '__imod__'), # x %= y
-    ('Pow', '**', '__pow__'), # x ** y
-    ('RPow', '**', '__rpow__'), # y ** x
-    ('IPow', '**', '__ipow__') # x **= y
 )
 
 prefix_unary_ops = (
@@ -59,6 +48,8 @@ unary_ops = prefix_unary_logical_ops + prefix_unary_ops + postfix_unary_ops
 all_ops = prefix_unary_ops + postfix_unary_ops + binary_ops
 
 class Expr(object):
+    def __init__(self, value):
+        self.value = value
     def __init__(self, value):
         self.value = value
 
@@ -94,6 +85,67 @@ class Expr(object):
 
 class Parenthesizing(object):
     pass
+
+
+    for cls, op, method in prefix_unary_ops + postfix_unary_ops:
+        exec("""
+        def {0}(self):
+            return {1}(self, other)
+        """.format(method, cls).strip())
+    del cls, op, method
+
+    for cls, op, method in binary_ops:
+        exec("""
+            def {0}(self, other):
+                return {1}(self, other)
+            """.format(method, cls).strip())
+    del cls, op, method
+
+    def __eq__(self, other):
+        if other is None:
+            return IsNone(self)
+        return Eq(self, other)
+
+    def __ne__(self, other):
+        if other is None:
+            return not IsNone(self)
+        return Ne(self, other)
+
+    def stack(self):
+        if hasattr(self.value, 'stack'):
+            return self.value.stack()
+        return self.value
+
+
+class Parenthesizing(object):
+    pass
+
+
+class PrefixUnaryOp(Expr, Parenthesizing):
+    def stack(self):
+        value = super(PrefixUnaryOp, self).stack()
+        return (value, self._op)
+
+    def __eq__(self, other):
+        if other is None:
+            return Is(self, other)
+        else:
+            return Eq(self, other)
+
+    def __ne__(self, other):
+        if other is None:
+            return IsNot(self, other)
+        else:
+            return Eq(self, other)
+
+    def stack(self):
+        if hasattr(self.value, 'stack'):
+            return self.value.stack()
+        return self.value
+
+
+class Parenthesizing(object):
+    """Base class to indicate a parenthesizing""""
 
 
 class PrefixUnaryOp(Expr, Parenthesizing):
