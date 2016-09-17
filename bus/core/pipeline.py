@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 
 from . import base, eip, processors
+from urlparse import urlparse
 
 class PipelineBuilder(object):
     def __init__(self):
@@ -247,3 +248,16 @@ class DslPipelineBuilder(PipelineBuilder):
     def build_with_plumber(self, plumber):
         assert len(self.to_list > 0), "Pipeline needs to have atleast one destination"
         return Pipeline(self, plumber)
+
+
+class URIPipelineBuilder(DslPipelineBuilder):
+    _pattern_modules = [base, eip]
+    _processor_modules = [processors]
+    def __init__(self):
+        super(DslPipelineBuilder, self).__init__()
+        self._destination_stack = []
+        self._builder_stack = [self,]
+        self._when_condition = None
+
+    def source(self, uri):
+        pass

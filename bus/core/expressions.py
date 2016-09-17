@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 
 import numbers
+import operator
 
 binary_ops = (
     ('Eq', '=', '__eq__'),
@@ -30,6 +31,8 @@ postfix_unary_ops = (
     ('IsNone', 'is_not', 'is_not')
 )
 
+all_ops = prefix_unary_ops + postfix_unary_ops + binary_ops
+
 class Expr(object):
     def __init__(self, value):
         self.value = value
@@ -58,9 +61,9 @@ class Expr(object):
             return not IsNone(self)
         return Ne(self, other)
 
-    def solve(self):
-        if hasattr(self.value, 'solve'):
-            return self.value.solve()
+    def stack(self):
+        if hasattr(self.value, 'stack'):
+            return self.value.stack()
         return self.value
 
 
@@ -69,12 +72,12 @@ class Parenthesizing(object):
 
 
 class PrefixUnaryOp(Expr, Parenthesizing):
-    def solve(self):
-        value = super(PrefixUnaryOp, self).solve()
+    def stack(self):
+        value = super(PrefixUnaryOp, self).stack()
         return (value, self._op)
 
 class PostfixUnaryOp(Expr, Parenthesizing):
-    def solve(self):
+    def stack(self):
         value = super(PostfixUnaryOp, self).solve()
         return (value, self._op)
 
@@ -91,9 +94,9 @@ class BinaryOp(Expr, Parenthesizing):
         self.left = left if isinstance(left, Expr) else Expr(left)
         self.right = right if isinstance(right, Expr) else Expr(right)
 
-    def solve(self):
-        left = self.left.solve()
-        right = self.right.solve()
+    def stack(self):
+        left = self.left.stack()
+        right = self.right.stack()
         return (left, self._op, right)
 
 for cls, op, method in binary_ops:
