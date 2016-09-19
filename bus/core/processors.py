@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-from .base import Processor, Destination
+from base import Processor, Destination
 
 class AggregatorProcessor(Processor):
     def __init__(self, aggregator):
@@ -16,10 +16,10 @@ class AggregatorProcessor(Processor):
     def _process(self, exchange):
         self.current_count += 1
         self.previous = self.aggregator.aggregate(self.previous, exchange)
-        if (self.aggregator.count is not None
+        if ((self.aggregator.count is not None
             and self.current_count == self.aggregator.count) or
             (self.aggregator.timeout is not None
-            and time.time() - self.time >= self.aggregator.timeout):
+            and time.time() - self.time >= self.aggregator.timeout)):
             self.forward(self.previous)
             return
 
@@ -100,10 +100,10 @@ class ResequencerProcessor(Processor):
     def _process(self, exchange):
         self.exchanges.append(exchange)
         self.current_count += 1
-        if (self.resequencer.count is not None
+        if ((self.resequencer.count is not None
             and self.current_count == self.resequencer.count) or
            (self.resequencer.timeout is not None
-            and time.time() - self.time >= self.resequencer.timeout()):
+            and time.time() - self.time >= self.resequencer.timeout())):
             self.resequencer.resequence(self.exchanges)
             self.forward(self.exchanges)
 

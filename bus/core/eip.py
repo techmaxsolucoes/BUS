@@ -1,6 +1,10 @@
 #-*- coding: utf-8 -*-
 
-class Aggregator(object):
+from __future__ import unicode_literals
+
+from base import ComponentMetaClass, with_metaclass
+
+class Aggregator(with_metaclass(ComponentMetaClass)):
     def __init__(self, plumber, params):
         self.plumber = plumber
         self.timeout = params.get("timeout")
@@ -10,7 +14,7 @@ class Aggregator(object):
         return current_exchange
 
 
-class ContentBasedRouter(object):
+class ContentBasedRouter(with_metaclass(ComponentMetaClass)):
     def __init__(self, plumber, params):
         self.plumber = plumber
         self.branches = []
@@ -20,11 +24,11 @@ class ContentBasedRouter(object):
 
     def get_valid_pipeline(self, exchange):
         for condition, pipeline in self.branches:
-            if condition(exchange)
+            if condition(exchange):
                 return pipeline
         return None
 
-class DynamicRouter(object):
+class DynamicRouter(with_metaclass(ComponentMetaClass)):
     def __init__(plumber, params):
         self.plumber = plumber
         self.params = params
@@ -33,7 +37,7 @@ class DynamicRouter(object):
         raise NotImplementedError("Subclass must implement the route method")
 
 
-class Filter(object):
+class Filter(with_metaclass(ComponentMetaClass)):
     def __init__(plumber):
         self.plumber = plumber
 
@@ -41,7 +45,7 @@ class Filter(object):
         raise NotImplementedError("Derived classes should implement the filter method")
 
 
-class Multicast(object):
+class Multicast(with_metaclass(ComponentMetaClass)):
     def __init__(plumber, params):
         self.plumber = plumber
         self.params = params
@@ -50,7 +54,7 @@ class Multicast(object):
         for builder in params.get("pipelines", []):
             self.pipelines.append(builder.build_with_plumber(plumber))
 
-class Resequencer(object):
+class Resequencer(with_metaclass(ComponentMetaClass)):
     def __init__(self, plumber, params):
         self.plumber = plumber
         self.timeout = params.get("timeout")
@@ -62,7 +66,7 @@ class Resequencer(object):
         exchange.sort(key=self.key_extractor, reverse=self.reverse)
 
 
-class RoutingSlip(object):
+class RoutingSlip(with_metaclass(ComponentMetaClass)):
     def __init__(self, plumber, params):
         self.plumber = plumber
         self.params = params
@@ -71,7 +75,7 @@ class RoutingSlip(object):
         raise NotImplementedError("Subclass must implement slip method")
 
 
-class Splitter(object):
+class Splitter(with_metaclass(ComponentMetaClass)):
     def __init__(self, plumber, params):
         self.plumber = plumber
 
@@ -79,7 +83,7 @@ class Splitter(object):
         raise NotImplementedError("Subclass must implement split method")
 
 
-class Validator(object):
+class Validator(with_metaclass(ComponentMetaClass)):
     def __init__(self, plumber):
         self.plumber = plumber
 
@@ -87,6 +91,6 @@ class Validator(object):
         raise NotImplementedError("Derived classes should implement the validate method")
 
 
-class Wiretap(object):
+class Wiretap(with_metaclass(ComponentMetaClass)):
     def __init__(self, endpoint):
         self.endpoint = endpoint

@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-from .base import Status
+from base import Status
 
 class Plumber(object):
     def __init__(self):

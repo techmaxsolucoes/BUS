@@ -1,5 +1,7 @@
 #-*- coding: utf-8
 
+from __future__ import unicode_literals
+
 import pickle
 
 class ComponentRegistry(object):
@@ -44,7 +46,7 @@ class ComponentRegistry(object):
         cls = self._registry.get(cls_str)
 
         if not cls:
-            raise QueueException("{} not found in ComponentRegistry".format(cls_str))
+            raise Exception("{} not found in ComponentRegistry".format(cls_str))
 
     def get_component_for_message(self, msg):
         """Convert a message from the queue into a component"""
